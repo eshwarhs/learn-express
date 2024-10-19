@@ -18,7 +18,7 @@ interface UserRequest extends Request {
 const app: Express = express();
 const port: number = 8000;
 
-const dataFile = './data/users.json';
+const dataFile = '../data/users.json';
 
 let users: User[];
 
@@ -49,6 +49,23 @@ app.get('/read/usernames', (req: UserRequest, res: Response) => {
   res.send(usernames);
 });
 
+app.use('/read/username', addMsgToRequest);
+app.get('/read/username/:name', (req: UserRequest, res: Response) => {
+  let name = req.params.name;
+  let users = req.users?.filter(function (user) {
+    return user.username === name;
+  });
+  console.log(users);
+  if (users?.length === 0) {
+    res.send({
+      error: { message: `${name} not found`, status: 404 }
+    });
+  }
+  else {
+    res.send(users);
+  }
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/write/adduser', addMsgToRequest);
@@ -64,5 +81,5 @@ app.post('/write/adduser', (req: UserRequest, res: Response) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+  console.log(`Example app listening on port ${port}`)
+})
